@@ -1,0 +1,43 @@
+networks:
+  graf-net:
+
+volumes:
+  grafana_data:
+  prometheus_data:
+  
+services:
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - 9090:9090
+    networks:
+      - graf-net
+    volumes:
+      - prometheus-data:/prometheus
+      - ./prometheus/:/etc/prometheus/
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    depends_on:
+      - snmp-exporter
+
+  snmp-exporter:
+    image: prom/snmp-exporter
+    volumes:
+      - ./snmp-exporter/snmp.yml:/etc/snmp_exporter/snmp.yml
+    networks:
+      - graf-net
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - graf-net
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+    depends_on:
+      - prometheus
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: "CHANGEME"
+      GF_USERS_ALLOW_SIGN_UP: "false"
