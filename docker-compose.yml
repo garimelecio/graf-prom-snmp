@@ -2,8 +2,8 @@ networks:
   graf-net:
 
 volumes:
-  grafana_data:
-  prometheus_data:
+  grafana-data:
+  prometheus-data:
   
 services:
   prometheus:
